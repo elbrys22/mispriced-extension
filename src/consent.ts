@@ -5,7 +5,7 @@
  */
 const KEY = "consent";
 /** Bumped when the extension starts sending something new, so the reader is asked again. */
-export const CONSENT_VERSION = 1;
+export const CONSENT_VERSION = 2;
 type Consent = { v: number; at: number };
 
 const ok = (c: unknown) => ((c as Consent | undefined)?.v ?? 0) >= CONSENT_VERSION;

@@ -19,10 +19,10 @@ export function ConsentBody() {
   return (
     <>
       <span className="card-b">
-        To find this market on the other venues, Mispriced sends the link of the venue page you're on to our server. Only market pages on the six venues, and
+        To find this market on the other venues, Mispriced sends the link of the venue page you're on to our server. Only market pages on the venues we compare, and
         nothing about you, your account or other sites.
       </span>
-      <span className="card-b">On Polymarket, Limitless, Opinion and predict.fun it also reads which outcome you click, to follow it. That stays in your browser.</span>
+      <span className="card-b">On every venue except Hyperliquid it also reads which outcome you click, to follow it. That stays in your browser.</span>
       <button type="button" className="btn-primary" onClick={() => void giveConsent()}>
         Allow and show prices
       </button>

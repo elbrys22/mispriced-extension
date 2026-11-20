@@ -19,7 +19,7 @@ import { pageLink, RELEASES, SITE, VENUES, venueLabel } from "./venues";
 const VERSION = chrome.runtime.getManifest().version;
 
 /** A tab title without the venue's name ("Fed Decision in December? | Polymarket"). */
-const cleanTitle = (t: string) => t.replace(/\s*[|\-–—·]\s*(Polymarket|Kalshi|Limitless|Opinion|predict\.fun|Hyperliquid)\b.*$/i, "").trim();
+const cleanTitle = (t: string) => t.replace(/\s*[|\-–—·]\s*(Polymarket|Kalshi|Limitless|Opinion|predict\.fun|Hyperliquid|XO(?: Market)?)\b.*$/i, "").trim();
 const endLabel = (ts: number | null) => {
   if (!ts) return null;
   const d = new Date(ts);
@@ -227,7 +227,7 @@ function Panel() {
   return (
     <Shell ago={lastAt ? `updated ${agoText(now - lastAt)}` : data && !stale ? "loading…" : ""} agoWarn={!!stale && !!lastAt} update={update}>
       <div className="scroll">
-        <MarketHead meta={market ? metaLine(market.category, market.endTs, listedN) : `${listedN} of 6 venues`} title={title} here={here} />
+        <MarketHead meta={market ? metaLine(market.category, market.endTs, listedN) : `${listedN} of ${VENUES.length} venues`} title={title} here={here} />
 
         {outcomes.length > 1 && (
           <div className="out-wrap">
@@ -327,7 +327,7 @@ function Panel() {
   );
 }
 
-const metaLine = (category: string, endTs: number | null, n: number) => <Parts items={[category, endLabel(endTs), `${n} of 6 venues`].filter(Boolean)} />;
+const metaLine = (category: string, endTs: number | null, n: number) => <Parts items={[category, endLabel(endTs), `${n} of ${VENUES.length} venues`].filter(Boolean)} />;
 
 function Shell({ ago, agoWarn, update, children }: { ago: string; agoWarn?: boolean; update?: string | null; children: React.ReactNode }) {
   const { notice, close } = useNotice();

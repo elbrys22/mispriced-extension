@@ -1,6 +1,7 @@
 /**
- * Runs on the venue pages whose links don't change when the reader picks an outcome (Polymarket,
- * Limitless, Opinion, predict.fun): on each click, the text of the clicked element and the
+ * Runs on the venue pages whose links don't always change when the reader picks an outcome
+ * (Polymarket, Kalshi in its narrow layout, as beside the side panel, Limitless, Opinion,
+ * predict.fun, XO): on each click, the text of the clicked element and the
  * elements around it goes to the extension, which matches it against the venue's outcome names
  * to follow the pick. Nothing is read until a click, nothing leaves the browser, and the page's
  * own layout is never relied on (its markup changes with every release).

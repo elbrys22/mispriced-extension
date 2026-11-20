@@ -9,7 +9,7 @@ See the prediction market you're on priced on every other venue, after fees.
 
 **[Download the extension](https://github.com/elbrys22/mispriced-extension/releases/latest/download/mispriced-extension.zip)**, then follow [Install](#install).
 
-Open a market on Polymarket, Kalshi, Limitless, Opinion, predict.fun or Hyperliquid, and the side
+Open a market on Polymarket, Kalshi, Limitless, Opinion, predict.fun, Hyperliquid (or Outcome) or XO, and the side
 panel shows the same market on every other venue that lists it, with each venue's average price
 after its fee for the amount you choose.
 
@@ -63,7 +63,7 @@ The only official sources are this repository's releases and links on
 | `sidePanel` | Shows the comparison beside the page. |
 | `storage` | Keeps your settings and the market found for each open tab. |
 | `alarms` | Refreshes the toolbar badge once a minute. |
-| The six venue sites | Reads the link of the market page you have open, and which outcome you click on it. |
+| The venue sites (and Outcome, which shows Hyperliquid's markets) | Reads the link of the market page you have open, and which outcome you click on it. |
 | `live.mispriced.fi` | Our server: finds the same market on the other venues and streams their public prices. |
 
 ## Privacy

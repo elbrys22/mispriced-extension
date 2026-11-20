@@ -1,10 +1,10 @@
 /**
- * The six venues the extension compares, in the order the panel lists its slots (design 24d), and
+ * The venues the extension compares, in the order the panel lists its slots (design 24d), and
  * each one's page link as a reader opens it: plain venue links, no referral codes.
  */
 import type { VenueLink as IndexVenue } from "@/lib/venuePage";
 
-export type VenueKey = "poly" | "kalshi" | "limitless" | "opinion" | "predictfun" | "hyperliquid";
+export type VenueKey = "poly" | "kalshi" | "limitless" | "opinion" | "predictfun" | "hyperliquid" | "xo";
 
 export const VENUES: { key: VenueKey; label: string; logo: string | null }[] = [
   { key: "poly", label: "Polymarket", logo: "venues/polymarket.svg" },
@@ -13,6 +13,7 @@ export const VENUES: { key: VenueKey; label: string; logo: string | null }[] = [
   { key: "opinion", label: "Opinion", logo: "venues/opinion.svg" },
   { key: "predictfun", label: "predict.fun", logo: "venues/predict.svg" },
   { key: "hyperliquid", label: "Hyperliquid", logo: "venues/hyperliquid.svg" },
+  { key: "xo", label: "XO", logo: "venues/xo.svg" },
 ];
 
 export const venueLabel = (v: string) => VENUES.find((x) => x.key === v)?.label ?? v;

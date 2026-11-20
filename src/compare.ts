@@ -90,7 +90,16 @@ export function matchId(list: Outcome[], here: string, books: VenueBooks | null 
   return ob ? (list.find((o) => o.vlabels[here] === ob.outcome) ?? null) : null;
 }
 
-const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
+// Words run together across tags ("Estac TroyesEstac Troyes" on XO, "Gavin Newsom11%Yes 11¢" on
+// Kalshi) come apart at a lower-to-upper case step and between letters and digits; labels go
+// through the same, so both sides stay alike.
+const norm = (s: string) =>
+  s
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Za-z])(\d)|(\d)([A-Za-z])/g, (_, a, b, c, d) => (a ? `${a} ${b}` : `${c} ${d}`))
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
 /** `label` as a whole phrase inside `text` ("October 2" isn't in "October 24"). */
 function hasPhrase(text: string, label: string): boolean {
   for (let i = text.indexOf(label); i >= 0; i = text.indexOf(label, i + 1)) {
@@ -98,6 +107,66 @@ function hasPhrase(text: string, label: string): boolean {
     if (!(before && /[a-z0-9]/.test(before)) && !(after && /[a-z0-9]/.test(after))) return true;
   }
   return false;
+}
+
+/**
+ * A row of another market on the same page ("Spread | Estac Troyes wins by over 1.5 goals", a
+ * total, a half, first to score, a map): it names an outcome but isn't a pick of this market. Such
+ * a word only counts against a label that doesn't carry it itself ("Over 2.5" stays fine).
+ */
+const MARKET_WORDS = /\b(by|over|under|spread|spreads|handicap|totals|goals|points|half|halftime|first|score|quarter|period|set|map|corners|cards)\b/g;
+const MARKET_WORD = new RegExp(MARKET_WORDS.source);
+function otherMarket(text: string, label: string): boolean {
+  return (text.match(MARKET_WORDS) ?? []).some((w) => !new RegExp(`\\b${w}\\b`).test(label));
+}
+
+/**
+ * Game pages show outcomes as short codes with a price: "TRO 46%" (Opinion), "TRO44¢" (Polymarket),
+ * "EST 45¢" / "LEH 30¢" (Limitless), "HAC 30¢" (predict.fun). A code is a run of word starts of one
+ * outcome's name: "tro" → Troyes, "hac" → Havre AC, "leh" → Le Havre, "draw" → Draw.
+ */
+const CODE = /([A-Za-z]{3,7})\s*\d{1,3}(?:\.\d+)?\s*[%¢]/;
+const CODES = new RegExp(CODE.source, "g");
+function codeOf(raw: string): string | null {
+  const m = new RegExp(`^${CODE.source}$`).exec(raw.trim());
+  const c = m?.[1].toLowerCase();
+  return c && !["yes", "buy", "sell"].includes(c) ? c : null;
+}
+/** Whether `code` is word starts of `name`, in order ("hac" in "le havre ac": h + ac). */
+function codeFits(code: string, name: string): boolean {
+  const words = name.split(/[^a-z0-9]+/).filter(Boolean);
+  const from = (ci: number, wi: number): boolean => {
+    if (ci === code.length) return true;
+    if (wi >= words.length) return false;
+    const w = words[wi];
+    for (let k = Math.min(w.length, code.length - ci); k >= 1; k--) if (code.startsWith(w.slice(0, k), ci) && from(ci + k, wi + 1)) return true;
+    return false;
+  };
+  return words.some((_, wi) => from(0, wi));
+}
+function byCode(list: Outcome[], names: string[][], code: string): Outcome | null {
+  const hit = list.filter((_, i) => names[i].some((n) => n === code || codeFits(code, n)));
+  return hit.length === 1 ? hit[0] : null;
+}
+/**
+ * The outcome a code button picked, if the click was on this market's own row: every code in the
+ * row (the first enclosing block with two or more) names one outcome of this market, each a
+ * different one, and the heading above it names no other market (halftime, first to score…).
+ */
+function matchCode(list: Outcome[], names: string[][], texts: string[]): Outcome | null {
+  const code = codeOf(texts[0] ?? "");
+  if (!code) return null;
+  const o = byCode(list, names, code);
+  if (!o) return null;
+  const g = texts.findIndex((t) => (t.match(CODES) ?? []).length >= 2);
+  if (g >= 0) {
+    const row = [...texts[g].matchAll(CODES)].map((m) => m[1].toLowerCase());
+    const picks = row.map((c) => byCode(list, names, c));
+    if (picks.some((p) => !p) || new Set(picks).size !== picks.length) return null;
+    const heading = texts[g + 1];
+    if (heading && MARKET_WORD.test(norm(heading))) return null;
+  }
+  return o;
 }
 
 /**
@@ -109,11 +178,16 @@ function hasPhrase(text: string, label: string): boolean {
 export function matchClick(list: Outcome[], here: string, texts: string[]): Outcome | null {
   const names = list.map((o) => {
     const ls = [o.vlabels[here], o.label].filter((l): l is string => !!l).map(norm);
-    return [...new Set(ls)].filter((l) => l.length > 1 && l !== "yes" && l !== "no");
+    // Opinion's game outcomes read "Estac Troyes wins"; its page buttons say "Estac Troyes".
+    const short = ls.map((l) => l.replace(/ (wins|win)$/, ""));
+    return [...new Set([...ls, ...short])].filter((l) => l.length > 1 && l !== "yes" && l !== "no");
   });
+  if (codeOf(texts[0] ?? "")) return matchCode(list, names, texts);
   for (const raw of texts) {
     const t = norm(raw);
-    const hits = list.map((o, i) => ({ o, l: names[i].filter((l) => hasPhrase(t, l)).sort((a, b) => b.length - a.length)[0] })).filter((h) => h.l);
+    const hits = list
+      .map((o, i) => ({ o, l: names[i].filter((l) => hasPhrase(t, l) && !otherMarket(t, l)).sort((a, b) => b.length - a.length)[0] }))
+      .filter((h) => h.l);
     if (hits.length === 1) return hits[0].o;
     if (hits.length > 1) {
       const top = hits.reduce((a, b) => (b.l.length > a.l.length ? b : a));

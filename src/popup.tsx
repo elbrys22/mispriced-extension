@@ -41,7 +41,7 @@ function Popup() {
 
   const consent = useConsent();
   const page = tab?.url ? venuePage(tab.url) : null;
-  const title = sum && sum.title ? sum.title : (tab?.title ?? "").replace(/\s*[|\-–—·]\s*(Polymarket|Kalshi|Limitless|Opinion|predict\.fun|Hyperliquid)\b.*$/i, "");
+  const title = sum && sum.title ? sum.title : (tab?.title ?? "").replace(/\s*[|\-–—·]\s*(Polymarket|Kalshi|Limitless|Opinion|predict\.fun|Hyperliquid|XO(?: Market)?)\b.*$/i, "");
   const openPanel = () => {
     if (tab?.windowId == null) return;
     void chrome.sidePanel.open({ windowId: tab.windowId }).then(() => window.close(), () => {});
@@ -55,7 +55,7 @@ function Popup() {
     <div className="popup">
       <header className="head">
         <span className="wordmark">mispriced.</span>
-        <span className="ago">6 venues</span>
+        <span className="ago">{VENUES.length} venues</span>
       </header>
       {notice && <NoticeBar notice={notice} onClose={close} />}
 
@@ -73,7 +73,7 @@ function Popup() {
             <PageLine sum={sum} />
           </>
         ) : (
-          <span className="pop-title muted">Not a market page. Open a market on any of the six venues.</span>
+          <span className="pop-title muted">Not a market page. Open a market on any of the venues.</span>
         )}
         <button type="button" className="btn-blue" onClick={openPanel}>
           Open side panel

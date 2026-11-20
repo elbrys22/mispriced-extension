@@ -5,7 +5,7 @@ export type TabInfo = { id: number; windowId: number; url: string | null; title:
 /**
  * The tab the panel sits next to: the active tab of the panel's window, followed as the reader
  * switches tabs or the page navigates (venue sites change pages without reloading). Chrome only
- * reveals the link of the six venue sites, so every other page reads as "not a market page".
+ * reveals the link of the venue sites, so every other page reads as "not a market page".
  * `?tab=<id>` pins one tab (opening the panel as a page, for testing).
  */
 export function useActiveTab(): TabInfo | null {

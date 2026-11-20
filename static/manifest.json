@@ -15,7 +15,7 @@
   "background": { "service_worker": "background.js", "type": "module" },
   "content_scripts": [
     {
-      "matches": ["https://polymarket.com/*", "https://limitless.exchange/*", "https://app.opinion.trade/*", "https://predict.fun/*"],
+      "matches": ["https://polymarket.com/*", "https://kalshi.com/*", "https://limitless.exchange/*", "https://app.opinion.trade/*", "https://predict.fun/*", "https://app.xo.market/*", "https://beta.xo.market/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
@@ -28,6 +28,10 @@
     "https://app.opinion.trade/*",
     "https://predict.fun/*",
     "https://app.hyperliquid.xyz/*",
+    "https://outcome.xyz/*",
+    "https://beta.xo.market/*",
+    "https://app.xo.market/*",
+    "https://xo.market/*",
     "https://live.mispriced.fi/*"
   ],
   "commands": {

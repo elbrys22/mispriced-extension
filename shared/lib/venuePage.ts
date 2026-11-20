@@ -75,6 +75,11 @@ export function venuePage(raw: string): VenuePage | null {
       const url = `https://app.opinion.trade/market/${seg[1].toLowerCase()}`;
       return { venue: "opinion", keys: [{ url }], link: { venue: "opinion", url } };
     }
+    // A game under /sports/<league>/<slug> (/esports too): the slug is the market's own.
+    if ((seg[0] === "sports" || seg[0] === "esports") && seg.length >= 3 && SLUG.test(seg[seg.length - 1])) {
+      const url = `https://app.opinion.trade/market/${seg[seg.length - 1].toLowerCase()}`;
+      return { venue: "opinion", keys: [{ url }], link: { venue: "opinion", url } };
+    }
     const topic = u.searchParams.get("topicId");
     if (seg[0] === "detail" && topic && /^\d{1,12}$/.test(topic)) {
       return { venue: "opinion", keys: [{ ref: `cat:${topic}` }], link: { venue: "opinion", url: `https://app.opinion.trade/detail?topicId=${topic}` } };
@@ -86,6 +91,31 @@ export function venuePage(raw: string): VenuePage | null {
     if (seg[0] !== "market" || !seg[1] || !SLUG.test(seg[1])) return null;
     const url = `https://predict.fun/market/${seg[1].toLowerCase()}`;
     return { venue: "predictfun", keys: [{ url }], link: { venue: "predictfun", url, ref: seg[1].toLowerCase() } };
+  }
+
+  if (host === "beta.xo.market" || host === "app.xo.market" || host === "xo.market") {
+    // /event/<slug>: the listing is the event (lib/xo xoUrl). beta. now redirects to app.
+    if (seg[0] !== "event" || !seg[1] || !SLUG.test(seg[1])) return null;
+    const url = `https://beta.xo.market/event/${seg[1].toLowerCase()}`;
+    return { venue: "xo", keys: [{ url }], link: { venue: "xo", url } };
+  }
+
+  if (host === "outcome.xyz") {
+    // Outcome (outcome.xyz) deploys Hyperliquid's outcome markets and numbers them the same way:
+    // /markets/<category>/q<question>[?outcome=<outcome>], /markets/<category>/o<outcome>, or a
+    // named page (/markets/sports/winner-epl) that adds ?outcome= itself. The picked outcome's
+    // coin (10 × outcome, YES side) goes to the live service, which answers its market and label.
+    if (seg[0] !== "markets" || seg.length < 3) return null;
+    const last = seg[seg.length - 1].toLowerCase();
+    const picked = u.searchParams.get("outcome");
+    const out = picked && /^\d{1,8}$/.test(picked) ? Number(picked) : /^o\d{1,8}$/.test(last) ? Number(last.slice(1)) : null;
+    if (out != null) {
+      const url = `https://app.hyperliquid.xyz/trade/%23${out * 10}`;
+      return { venue: "hyperliquid", keys: [], link: { venue: "hyperliquid", url }, find: { hl: `#${out * 10}` } };
+    }
+    const q = /^q(\d{1,8})$/.exec(last);
+    if (!q) return null;
+    return { venue: "hyperliquid", keys: [{ ref: `q:${q[1]}` }], link: { venue: "hyperliquid", url: "https://app.hyperliquid.xyz/trade" } };
   }
 
   if (host === "app.hyperliquid.xyz") {
