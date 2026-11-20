@@ -7,6 +7,8 @@ See the prediction market you're on priced on every other venue, after fees.
 
 ![The Mispriced side panel next to a market page](images/panel.png)
 
+**[Download the extension](https://github.com/elbrys22/mispriced-extension/releases/latest/download/mispriced-extension.zip)**, then follow [Install](#install).
+
 Open a market on Polymarket, Kalshi, Limitless, Opinion, predict.fun or Hyperliquid, and the side
 panel shows the same market on every other venue that lists it, with each venue's average price
 after its fee for the amount you choose.
@@ -31,8 +33,9 @@ tested.
 
 ## Install
 
-1. Download `mispriced-extension-<version>.zip` from the
-   [latest release](https://github.com/elbrys22/mispriced-extension/releases/latest) and unzip it.
+1. **[Download mispriced-extension.zip](https://github.com/elbrys22/mispriced-extension/releases/latest/download/mispriced-extension.zip)**
+   (the latest version) and unzip it. Don't use GitHub's green **Code → Download ZIP** button:
+   that's the source code, and Chrome can't load it.
 2. Open `chrome://extensions` and switch on **Developer mode** (top right).
 3. Click **Load unpacked** and pick the unzipped folder.
 4. Pin Mispriced to the toolbar, open a market on any venue, click the icon and open the side panel
@@ -43,7 +46,8 @@ Keep the folder where it is: Chrome runs the extension from it.
 
 ## Update
 
-When a new version is out, the panel shows "Version x.y.z is out". Download the new zip, unzip it
+When a new version is out, the panel shows "Version x.y.z is out". Download the
+[latest zip](https://github.com/elbrys22/mispriced-extension/releases/latest/download/mispriced-extension.zip), unzip it
 over the old folder, then press the reload arrow on Mispriced's card in `chrome://extensions`. Your
 settings stay. Every version is listed under [Releases](https://github.com/elbrys22/mispriced-extension/releases).
 
@@ -75,6 +79,11 @@ click never leaves your browser. There are no analytics in the extension. Full p
 **Chrome warns about "developer mode extensions". Is that a problem?**
 No. Chrome shows it for every extension installed from a folder rather than a store. Mispriced isn't
 in the Chrome Web Store, so this is how it installs.
+
+**Chrome says "Manifest file is missing or unreadable".**
+You loaded the source code (a folder named `mispriced-extension-main`). Download
+[mispriced-extension.zip](https://github.com/elbrys22/mispriced-extension/releases/latest/download/mispriced-extension.zip)
+instead, unzip it and load that folder.
 
 **The panel stays empty after an update.**
 Reload the venue's tab once: Chrome only adds the updated extension to pages opened after the reload.
