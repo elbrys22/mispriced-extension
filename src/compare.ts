@@ -98,8 +98,13 @@ const norm = (s: string) =>
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/([A-Za-z])(\d)|(\d)([A-Za-z])/g, (_, a, b, c, d) => (a ? `${a} ${b}` : `${c} ${d}`))
     .toLowerCase()
+    // Accents off ("Mönchengladbach" = "Monchengladbach"): venues spell names either way.
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ")
     .trim();
+/** German spelling without accents, as codes use it: "MOE" for Mönchengladbach. */
+const umlauts = (s: string) => s.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss");
 /** `label` as a whole phrase inside `text` ("October 2" isn't in "October 24"). */
 function hasPhrase(text: string, label: string): boolean {
   for (let i = text.indexOf(label); i >= 0; i = text.indexOf(label, i + 1)) {
@@ -177,7 +182,8 @@ function matchCode(list: Outcome[], names: string[][], texts: string[]): Outcome
  */
 export function matchClick(list: Outcome[], here: string, texts: string[]): Outcome | null {
   const names = list.map((o) => {
-    const ls = [o.vlabels[here], o.label].filter((l): l is string => !!l).map(norm);
+    const raw = [o.vlabels[here], o.label].filter((l): l is string => !!l);
+    const ls = [...raw, ...raw.map(umlauts)].map(norm);
     // Opinion's game outcomes read "Estac Troyes wins"; its page buttons say "Estac Troyes".
     const short = ls.map((l) => l.replace(/ (wins|win)$/, ""));
     return [...new Set([...ls, ...short])].filter((l) => l.length > 1 && l !== "yes" && l !== "no");
